@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Pre-Publish Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-10">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🎬 YouTube Performance Predictor</h1>
+            <p class="text-gray-600">AI-powered predictions for your videos before you publish</p>
+        </header>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column: Input Form -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-6">Video Analysis</h2>
+                
+                <form id="analysisForm">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Video Title
+                            </label>
+                            <input type="text" id="title" name="title" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Enter your video title here...">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Thumbnail URL
+                            </label>
+                            <input type="url" id="thumbnail_url" name="thumbnail_url" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="https://example.com/thumbnail.jpg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Description
+                            </label>
+                            <textarea id="description" name="description" rows="6"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Enter your video description..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Tags (comma-separated)
+                            </label>
+                            <textarea id="tags" name="tags" rows="3"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="tag1, tag2, tag3..."></textarea>
+                        </div>
+                        
+                        <button type="submit"
+                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-lg hover:opacity-90 transition duration-300">
+                            🔮 Analyze Video Performance
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Pricing Section -->
+                <div class="mt-10 pt-6 border-t border-gray-200">
+                    <h3 class="text-xl font-bold mb-4">Service Packages</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border border-gray-300 rounded-lg p-4 hover:border-blue-500 transition">
+                            <h4 class="font-bold text-lg">🎯 Pre-Publish Audit</h4>
+                            <p class="text-2xl font-bold text-blue-600 my-2">$67</p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ AI Score (1-100)</li>
+                                <li>✓ Improvement suggestions</li>
+                                <li>✓ Alternative title ideas</li>
+                                <li>✓ Thumbnail recommendations</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="border border-gray-300 rounded-lg p-4 hover:border-purple-500 transition">
+                            <h4 class="font-bold text-lg">📈 Channel Growth Plan</h4>
+                            <p class="text-2xl font-bold text-purple-600 my-2">$247</p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ Analysis of 10 past videos</li>
+                                <li>✓ Content strategy for next month</li>
+                                <li>✓ Thumbnail style guide</li>
+                                <li>✓ Competitor analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Results -->
+            <div class="space-y-8">
+                <!-- Score Card -->
+                <div id="resultsSection" class="hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">Analysis Results</h2>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-600">Overall Score</p>
+                                <div class="flex items-center">
+                                    <div id="scoreCircle" class="w-24 h-24 rounded-full border-8 border-gray-200 flex items-center justify-center">
+                                        <span id="scoreValue" class="text-3xl font-bold">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Score Interpretation -->
+                        <div id="scoreInterpretation" class="mb-8">
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-bold mb-2">Interpretation:</h4>
+                                <p id="interpretationText" class="text-gray-700"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Predictions -->
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-sm text-blue-600 font-medium">Predicted 48h Views</p>
+                                <p id="predictedViews" class="text-2xl font-bold text-blue-700">0</p>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <p class="text-sm text-purple-600 font-medium">CTR Probability</p>
+                                <p id="predictedCTR" class="text-2xl font-bold text-purple-700">0%</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Suggestions -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4">📝 Improvement Suggestions</h3>
+                            <ul id="suggestionsList" class="space-y-3"></ul>
+                        </div>
+                        
+                        <!-- Alternatives -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">💡 Alternative Titles</h3>
+                                <ul id="alternativeTitles" class="space-y-2"></ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">🎨 Thumbnail Ideas</h3>
+                                <ul id="thumbnailIdeas" class="space-y-2"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features Chart -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">Feature Analysis</h3>
+                    <div class="h-64">
+                        <canvas id="featuresChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- CTA Section -->
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-8 text-white text-center">
+                    <h3 class="text-2xl font-bold mb-3">Ready to Transform Your YouTube Channel?</h3>
+                    <p class="mb-6">Get your first audit at 50% discount - only $33.50</p>
+                    <button class="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition">
+                        🚀 Claim Your Discount
+                    </button>
+                    <p class="text-sm mt-4 opacity-90">Limited to first 100 clients this month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                thumbnail_url: document.getElementById('thumbnail_url').value,
+                description: document.getElementById('description').value,
+                tags: document.getElementById('tags').value
+            };
+            
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Analyzing...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                displayResults(result);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Analysis failed. Please try again.');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function displayResults(result) {
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // Update score
+            const score = Math.round(result.score);
+            document.getElementById('scoreValue').textContent = score;
+            
+            // Update score circle color
+            const scoreCircle = document.getElementById('scoreCircle');
+            if (score >= 80) {
+                scoreCircle.style.borderColor = '#10B981';
+            } else if (score >= 60) {
+                scoreCircle.style.borderColor = '#3B82F6';
+            } else if (score >= 40) {
+                scoreCircle.style.borderColor = '#F59E0B';
+            } else {
+                scoreCircle.style.borderColor = '#EF4444';
+            }
+            
+            // Update interpretation
+            let interpretation = '';
+            if (score >= 80) {
+                interpretation = 'Excellent! This video has high viral potential. Consider publishing as-is.';
+            } else if (score >= 60) {
+                interpretation = 'Good! With minor improvements, this could perform very well.';
+            } else if (score >= 40) {
+                interpretation = 'Average. Consider implementing the suggestions below.';
+            } else {
+                interpretation = 'Needs significant improvement. Review all suggestions carefully.';
+            }
+            document.getElementById('interpretationText').textContent = interpretation;
+            
+            // Update predictions
+            document.getElementById('predictedViews').textContent = 
+                Math.round(result.predictions.views_48h).toLocaleString();
+            document.getElementById('predictedCTR').textContent = 
+                (result.predictions.engagement_rate * 100).toFixed(1) + '%';
+            
+            // Update suggestions
+            const suggestionsList = document.getElementById('suggestionsList');
+            suggestionsList.innerHTML = '';
+            result.suggestions.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start';
+                li.innerHTML = `
+                    <span class="text-green-500 mr-2">✓</span>
+                    <span>${suggestion}</span>
+                `;
+                suggestionsList.appendChild(li);
+            });
+            
+            // Update alternatives
+            const alternativeTitles = document.getElementById('alternativeTitles');
+            alternativeTitles.innerHTML = '';
+            result.alternatives.titles.forEach(title => {
+                const li = document.createElement('li');
+                li.className = 'bg-gray-50 p-3 rounded-lg border border-gray-200';
+                li.textContent = title;
+                alternativeTitles.appendChild(li);
+            });
+            
+            const thumbnailIdeas = document.getElementById('thumbnailIdeas');
+            thumbnailIdeas.innerHTML = '';
+            result.alternatives.thumbnail_ideas.forEach(idea => {
+                const li = document.createElement('li');
+                li.className = 'bg-gray-50 p-3 rounded-lg border border-gray-200';
+                li.textContent = idea;
+                thumbnailIdeas.appendChild(li);
+            });
+            
+            // Update chart
+            updateFeaturesChart(result.features);
+        }
+        
+        function updateFeaturesChart(features) {
+            const ctx = document.getElementById('featuresChart').getContext('2d');
+            
+            // Select key features for display
+            const featureData = {
+                labels: ['Title Curiosity', 'Thumbnail Impact', 'Description Quality', 'Tag Relevance'],
+                datasets: [{
+                    label: 'Feature Score',
+                    data: [
+                        features.title_curiosity_score * 100,
+                        features.thumb_brightness / 2.55,
+                        Math.min(features.desc_length / 50, 100),
+                        Math.min(features.tag_count * 10, 100)
+                    ],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.5)',
+                        'rgba(139, 92, 246, 0.5)',
+                        'rgba(16, 185, 129, 0.5)',
+                        'rgba(245, 158, 11, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgb(59, 130, 246)',
+                        'rgb(139, 92, 246)',
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)'
+                    ],
+                    borderWidth: 2
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'radar',
+                data: featureData,
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
