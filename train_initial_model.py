@@ -113,7 +113,7 @@ def train_model(df):
 
 if __name__ == "__main__":
     # YouTube API Key (get from Google Cloud Console)
-    API_KEY = "YOUR_YOUTUBE_API_KEY_HERE"
+    API_KEY = "AIzaSyAFNFFB1fjNrtSr_tnpiTiZalPV23d6-qA"
     
     # Define niches to collect data from
     niches = [
